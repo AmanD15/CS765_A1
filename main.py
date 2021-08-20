@@ -1,14 +1,18 @@
 import obj
 import random
-
+import func
 new_block = obj.genesisBlock()
-node = []
-for i in range(10):
-    node.append(obj.node(i,0.1))
-for i in range(10):
-    node[i].add_peer(node[random.randint(0,9)])
-    TXN = node[i].generateTransaction(9-i,random.randint(0,9))
 
+num_nodes = 10
+nodes = func.createNodes(num_nodes)
+func.connectPeers(nodes)
 
-for task in sorted(obj.tasks):
+for i in range(num_nodes):
+    TXN = nodes[i].generateTransaction(num_nodes - i - 1,random.randint(0,num_nodes-1))
+
+while len(obj.tasks.keys()):
+    task = sorted(obj.tasks.keys())[0]
     print(obj.tasks[task])
+    if obj.tasks[task].split(":")[0] == "ReceiveTXN":
+        nodes[int(obj.tasks[task].split(" ")[1])].receiveTransaction(obj.tasks[task].split(" ",2)[2],task)
+    del obj.tasks[task]

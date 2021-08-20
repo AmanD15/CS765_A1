@@ -34,13 +34,13 @@ class node:
 		TXN_ID = random.randint(1,TXN_ID_size)
 
 		# Add TXN generation to list of tasks
-		tasks[next_event_time] = str(TXN_ID) + ": " + str(self.uniqueID) + " pays " + str(payee_ID) + " "+str(amount)+" coins"
+		tasks[next_event_time] = "GenerateTXN: " + str(TXN_ID) + ": " + str(self.uniqueID) + " pays " + str(payee_ID) + " "+str(amount)+" coins"
 		
 		# Update own set of pending TXN
-		self.pending_TXN[TXN_ID] = tasks[next_event_time]
+		self.pending_TXN[TXN_ID] = tasks[next_event_time].split(": ",1)[1]
 
 		# Broadcast to peers
-		self.broadcastTransaction(tasks[next_event_time],next_event_time)
+		self.broadcastTransaction(tasks[next_event_time].split(": ",1)[1],next_event_time)
 		return tasks[next_event_time]
 
 	def broadcastTransaction(self, TXN, start_time):
@@ -49,6 +49,10 @@ class node:
 			 random.expovariate(self.peers[peer][1]/(96*1024)) + start_time]\
 			 = "ReceiveTXN: "+str(peer)+" " + TXN
 
+	def receiveTransaction(self, TXN, start_time):
+		if (int(TXN.split(":")[0]) not in self.pending_TXN):
+			self.pending_TXN[int(TXN.split(":")[0])] = TXN
+			self.broadcastTransaction( TXN, start_time)
 
 class block:
 
