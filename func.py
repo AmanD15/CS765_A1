@@ -1,18 +1,23 @@
 import obj
+import param
 import random
 
-p = 1
-
+# Creates nodes in the network
 def createNodes(num_nodes):
-    nodes = []
     for i in range(num_nodes):
-        nodes.append(obj.node(i,1))
+        param.nodes[i] = (obj.node(i,1))
 
-    return nodes
-
-def connectPeers(nodes):
-    for i in range(len(nodes)):
-        for j in range(i+1,len(nodes)):
-            if (random.random()<p):
-                nodes[i].add_peer(nodes[j])
-                nodes[j].add_peer(nodes[i])
+# Generates a connected graph through random sampling
+def connectPeers():
+    for i in range(len(param.nodes)):
+        first_peer = random.randint(0,len(param.nodes)-1)
+        if (first_peer == i):
+            first_peer = 0
+            if (i==0) and len(param.nodes)>1:
+                first_peer = 1
+        param.nodes[i].add_peer(param.nodes[first_peer])
+        param.nodes[first_peer].add_peer(param.nodes[i])
+        for j in range(i+1,len(param.nodes)):
+            if (random.random()<param.uniform_sampling_p):
+                param.nodes[i].add_peer(param.nodes[j])
+                param.nodes[j].add_peer(param.nodes[i])
