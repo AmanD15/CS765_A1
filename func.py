@@ -3,9 +3,9 @@ import param
 import random
 
 # Creates nodes in the network
-def createNodes(num_nodes):
-    for i in range(num_nodes):
-        param.nodes[i] = (obj.node(i,1))
+def createNodes():
+    for i in range(param.num_nodes):
+        param.nodes[i] = (obj.node(i,200))
 
 # Generates a connected graph through random sampling
 def connectPeers():

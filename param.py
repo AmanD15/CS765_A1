@@ -1,4 +1,4 @@
-num_nodes = 5
+num_nodes = 100
 
 uniform_sampling_p = 0.1
 
@@ -15,3 +15,6 @@ TXN_ID_size = 0x11111111	# 32 bit ID for TXN
 # Value is a string describing the event
 tasks = {}
 nodes = {}
+
+next_TXN_ID = 0
+next_block_ID = 1

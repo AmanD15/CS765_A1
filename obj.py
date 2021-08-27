@@ -1,6 +1,7 @@
 import param
 import random
 
+
 # Node class to store each peer
 class node:
 	
@@ -11,6 +12,7 @@ class node:
 		self.ia_time = ia_time
 		self.pending_TXN = {}
 		self.peers = {}
+		self.balance = 20
 
 		# Bloackchain stores a list of blocks
 		# Key is the uniqueID of the block
@@ -18,7 +20,7 @@ class node:
 		# First is the distance from genesis block
 		# Second is the pointer to the block object for the block
 		self.blockchain = {}
-		self.blockchain[0] = [1,genesisBlock()]
+		self.blockchain[0] = [0,genesisBlock()]
 		self.longest = self.blockchain[0]
 
 	# Handle to add new peer 
@@ -31,8 +33,9 @@ class node:
 		# Compute time at which the TXN is generated (using exponetial distribution)
 		next_event_time = random.expovariate(1/self.ia_time) + start_time
 
-		# Unique TXN_ID (as random 32bit integer, assuming collision resistance)
-		TXN_ID = random.randint(1,param.TXN_ID_size)
+		# Unique TXN_ID
+		TXN_ID = param.next_TXN_ID
+		param.next_TXN_ID += 1
 
 		# Add TXN generation to list of tasks
 		param.tasks[next_event_time] = "GenerateTXN: " + str(TXN_ID) + ": " + str(self.uniqueID) + " pays " + str(payee_ID) + " "+str(amount)+" coins"
@@ -55,11 +58,16 @@ class node:
 			 = "ReceiveTXN: "+str(self.uniqueID)+" "+str(peer)+" " + TXN
 
 	def receiveTransaction(self, TXN, start_time, sender):
-		# Proceed to broadcat if TXN not already received
+		
+		# Proceed to broadcast if TXN not already received
 		# Else it would have been broadcasted earlier
 		if (int(TXN.split(":")[0]) not in self.pending_TXN):
 			self.pending_TXN[int(TXN.split(":")[0])] = TXN
 			self.broadcastTransaction( TXN, start_time, sender)
+
+			# Check whether the money in the TXN is for the receiver
+			if (int(TXN.split(" ")[3]) - self.uniqueID == 0):
+				self.balance += int(TXN.split(" ")[4])
 
 	# Function to generate block
 	def generateBlock(self):
@@ -81,7 +89,8 @@ class block:
 
 	def __init__(self, prev_block):
 		self.prev_block = prev_block
-		self.uniqueID = random.randint(1,param.Block_ID_size)
+		self.uniqueID = param.next_block_ID
+		param.next_block_ID += 1
 
 # Genesis block. All nodes start with this (see init function of node).
 class genesisBlock:
