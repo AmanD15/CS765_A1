@@ -19,6 +19,8 @@ while len(param.tasks.keys()):
 
     # Read the next task to perform
     task = sorted(param.tasks.keys())[0]
+    if (task > param.max_sim_time):
+        break
 
     # Print the next task (Debugging)
     print("Time  ",task,"\t",param.tasks[task])
@@ -55,3 +57,6 @@ while len(param.tasks.keys()):
 
     # Delete the task after it is processed appropriately
     del param.tasks[task]
+
+for nodes in param.nodes.values():
+    nodes.writeDataToFile()

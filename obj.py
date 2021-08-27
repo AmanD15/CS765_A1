@@ -14,11 +14,12 @@ class node:
 		self.peers = {}
 		self.balance = 20
 
-		# Bloackchain stores a list of blocks
+		# Blockchain stores a list of blocks seen by the node
 		# Key is the uniqueID of the block
-		# Value is a listof two elements:
+		# Value is a list of two elements:
 		# First is the distance from genesis block
 		# Second is the pointer to the block object for the block
+		# As the block has the ID of the previous block, we can create a chain from the block
 		self.blockchain = {}
 		self.blockchain[0] = [0,genesisBlock()]
 		self.longest = self.blockchain[0]
@@ -81,6 +82,14 @@ class node:
 	# It will also validate the received block and broadcast further if valid
 	def receiveBlock(self):
 		pass
+
+	def writeDataToFile(self):
+		file = open(param.file_prefix+str(self.uniqueID)+param.file_extension,"w")
+		file.write(str(self.uniqueID)+"\n")
+		for TXN in self.pending_TXN.values():
+			file.write(TXN+"\n")
+		file.close()
+
 
 
 # Object defining the structure of instance block

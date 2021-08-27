@@ -5,7 +5,7 @@ import random
 # Creates nodes in the network
 def createNodes():
     for i in range(param.num_nodes):
-        param.nodes[i] = (obj.node(i,200))
+        param.nodes[i] = (obj.node(i,20))
 
 # Generates a connected graph through random sampling
 def connectPeers():
