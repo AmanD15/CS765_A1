@@ -85,9 +85,11 @@ class node:
 
 	def writeDataToFile(self):
 		file = open(param.file_prefix+str(self.uniqueID)+param.file_extension,"w")
-		file.write(str(self.uniqueID)+"\n")
-		for TXN in self.pending_TXN.values():
-			file.write(TXN+"\n")
+		for block in self.blockchain.values():
+			if (block[1].uniqueID == 0):
+				continue
+			else:
+				file.write(str(block[1].uniqueID)+" "+str(block[1].prev_block.uniqueID)+"\n")
 		file.close()
 
 
