@@ -12,9 +12,9 @@ class node:
 		self.ia_time = ia_time
 		self.pending_TXN = {}
 		self.peers = {}
-		self.balance = 20
+		self.balance = 0
 
-		# Blockchain stores a list of blocks seen by the node
+		# Blockchain stores a list of blocks validated by the node
 		# Key is the uniqueID of the block
 		# Value is a list of two elements:
 		# First is the distance from genesis block
@@ -71,12 +71,28 @@ class node:
 				self.balance += int(TXN.split(" ")[4])
 
 	# Function to generate block
-	def generateBlock(self):
-		pass
+	def generateBlock(self,start_time):
+		# Compute time at which the TXN is generated (using exponetial distribution)
+		# Copied from TXN part.  Edit mean creation time as suitable
+		next_event_time = random.expovariate(1/self.ia_time) + start_time
+
+		new_block = block(self.longest[1])
+		param.blocks[new_block.uniqueID] = new_block
+
+		# Add TXN generation to list of tasks
+		param.tasks[next_event_time] = "GenerateBlock: " + str(self.uniqueID) +" "+  str(new_block.uniqueID)
+
+		# Broadcast to peers (omit no peers)
+		self.broadcastBlock(new_block,next_event_time,[])
 	
 	# Function to broadcast a block to peers
-	def broadcastBlock(self):
-		pass
+	def broadcastBlock(self,block,start_time,peers_to_omit):
+		for peer in self.peers:
+			if (peer in peers_to_omit):
+				continue
+			param.tasks[self.peers[peer][0]+ param.Block_size/self.peers[peer][1] +\
+			 random.expovariate(self.peers[peer][1]/(96*1024)) + start_time]\
+			 = "ReceiveBlock: "+str(self.uniqueID)+" "+str(peer)+" "+str(block.uniqueID)
 
 	# Function to receive block
 	# It will also validate the received block and broadcast further if valid

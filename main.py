@@ -3,11 +3,8 @@ import func
 import param
 import random
 
-# Creates nodes
-nodes = func.createNodes()
-
-# Randomly samples nodes to connect peers
-func.connectPeers()
+# Creates network of peers
+nodes = func.createNetwork()
 
 # Generate first empty transaction for each node
 for i in range(param.num_nodes):
@@ -49,14 +46,14 @@ while len(param.tasks.keys()):
         data = param.tasks[task].split(" ",3)
         param.nodes[int(data[2])].receiveTransaction(data[3],task,[int(data[1])])
 
-    money_in_circulation = 0
-    for node in param.nodes.values():
-        money_in_circulation += node.balance
+    # money_in_circulation = 0
+    # for node in param.nodes.values():
+    #     money_in_circulation += node.balance
     # print(money_in_circulation)
 
 
     # Delete the task after it is processed appropriately
     del param.tasks[task]
 
-for nodes in param.nodes.values():
-    nodes.writeDataToFile()
+# for nodes in param.nodes.values():
+#     nodes.writeDataToFile()

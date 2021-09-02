@@ -3,12 +3,11 @@ import param
 import random
 
 # Creates nodes in the network
-def createNodes():
+def createNetwork():
     for i in range(param.num_nodes):
         param.nodes[i] = (obj.node(i,20))
 
-# Generates a connected graph through random sampling
-def connectPeers():
+    # Generate a connected graph through random sampling
     for i in range(len(param.nodes)):
         first_peer = random.randint(0,len(param.nodes)-1)
         if (first_peer == i):
