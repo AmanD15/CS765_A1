@@ -2,17 +2,18 @@ import obj
 import param
 import random
 
+
 # Creates nodes in the network
-def createNetwork():
-    for i in range(param.num_nodes):
+def createNetwork(num_nodes=10):
+    for i in range(num_nodes):
         param.nodes[i] = (obj.node(i,20))
 
     # Generate a connected graph through random sampling
     for i in range(len(param.nodes)):
         first_peer = random.randint(0,len(param.nodes)-1)
-        if (first_peer == i):
+        if first_peer == i:
             first_peer = 0
-            if (i==0) and len(param.nodes)>1:
+            if i == 0 and len(param.nodes)>1:
                 first_peer = 1
         param.nodes[i].add_peer(param.nodes[first_peer])
         param.nodes[first_peer].add_peer(param.nodes[i])

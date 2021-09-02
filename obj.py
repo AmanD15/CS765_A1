@@ -1,4 +1,5 @@
 import param
+import main
 import random
 
 
@@ -8,7 +9,7 @@ class node:
 	# Initialize
 	def __init__(self,uniqueID,ia_time):
 		self.uniqueID = uniqueID
-		self.fast = (random.random()>param.frac_slow)
+		self.fast = (random.random()>main.parser.percent_slow)
 		self.ia_time = ia_time
 		self.pending_TXN = {}
 		self.peers = {}
@@ -39,7 +40,8 @@ class node:
 		param.next_TXN_ID += 1
 
 		# Add TXN generation to list of tasks
-		param.tasks[next_event_time] = "GenerateTXN: " + str(TXN_ID) + ": " + str(self.uniqueID) + " pays " + str(payee_ID) + " "+str(amount)+" coins"
+		param.tasks[next_event_time] = str(TXN_ID) + ": " + str(self.uniqueID) + " pays " + str(payee_ID)\
+									   + " " + str(amount) + " coins"
 		
 		# Update own set of pending TXN
 		self.pending_TXN[TXN_ID] = param.tasks[next_event_time].split(": ",1)[1]
