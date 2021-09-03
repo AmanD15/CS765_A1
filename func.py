@@ -37,5 +37,3 @@ def createNetwork(num_nodes=10, num_connections=12):
         adjacency_matrix[no_connection_rows[random_edge], no_connection_cols[random_edge]] = 1
 
         num_connections_left = num_connections_left - 1
-
-    return adjacency_matrix

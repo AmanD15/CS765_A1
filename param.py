@@ -2,6 +2,7 @@ num_nodes = 10
 max_sim_time = 100
 block_fee = 50
 
+percent_slow = 0.1
 uniform_sampling_p = 0.1
 
 TXN_size = 1024 * 8			# 1kB
