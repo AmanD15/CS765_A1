@@ -91,7 +91,7 @@ class node:
         for peer in self.peers:
             if (peer in peers_to_omit):
                 continue
-            param.tasks[self.peers[peer][0] + block.Block_size / self.peers[peer][1] + \
+            param.tasks[self.peers[peer][0] + block.size / self.peers[peer][1] + \
                         random.expovariate(self.peers[peer][1] / (96 * 1024)) + start_time] \
                 = "ReceiveBlock: " + str(self.uniqueID) + " " + str(peer) + " " + str(block.uniqueID)
 
@@ -110,13 +110,14 @@ class node:
         file.close()
 
 
+
 # Object defining the structure of instance block
 # Add other methods/arguments as required
 class block:
 
     def __init__(self, prev_block):
         self.prev_block = prev_block
-		# self.Block_size = param.TXN_size
+        self.size = param.TXN_size
         self.uniqueID = param.next_block_ID
         param.next_block_ID += 1
 
@@ -126,4 +127,4 @@ class genesisBlock:
 
     def __init__(self):
         self.uniqueID = 0
-		# self.Block_size = param.TXN_size
+        self.size = param.TXN_size
