@@ -12,7 +12,7 @@ class node:
         self.ia_time = ia_time
         self.pending_TXN = {}
         self.peers = {}
-        self.balance = 0
+        self.balance = param.start_coins
 
         # Blockchain stores a list of blocks validated by the node
         # Key is the uniqueID of the block

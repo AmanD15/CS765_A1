@@ -2,6 +2,7 @@ max_sim_time = 100
 
 num_nodes = 10
 num_connections = 12
+start_coins = 0.0
 
 T_tx = 20
 T_k = 5
