@@ -39,7 +39,7 @@ class node:
         param.next_TXN_ID += 1
 
         # Add TXN generation to list of tasks
-        param.tasks[next_event_time] = str(TXN_ID) + ": " + str(self.uniqueID) + " pays " + str(payee_ID) \
+        param.tasks[next_event_time] = "GenerateTXN: " + str(TXN_ID) + ": " + str(self.uniqueID) + " pays " + str(payee_ID) \
                                        + " " + str(amount) + " coins"
 
         # Update own set of pending TXN
@@ -91,7 +91,7 @@ class node:
         for peer in self.peers:
             if (peer in peers_to_omit):
                 continue
-            param.tasks[self.peers[peer][0] + param.Block_size / self.peers[peer][1] + \
+            param.tasks[self.peers[peer][0] + block.Block_size / self.peers[peer][1] + \
                         random.expovariate(self.peers[peer][1] / (96 * 1024)) + start_time] \
                 = "ReceiveBlock: " + str(self.uniqueID) + " " + str(peer) + " " + str(block.uniqueID)
 
@@ -116,6 +116,7 @@ class block:
 
     def __init__(self, prev_block):
         self.prev_block = prev_block
+		# self.Block_size = param.TXN_size
         self.uniqueID = param.next_block_ID
         param.next_block_ID += 1
 
@@ -125,3 +126,4 @@ class genesisBlock:
 
     def __init__(self):
         self.uniqueID = 0
+		# self.Block_size = param.TXN_size
