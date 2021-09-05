@@ -1,4 +1,4 @@
-from obj import node
+from obj import node, genesisBlock
 import param
 import random
 import numpy as np
@@ -65,11 +65,13 @@ def createNetwork():
     # Everyone knows each other's initial balance
     for i in range(num_nodes):
         for j in range(num_nodes):
-            param.nodes[i].perceived_balance[param.nodes[j]] = param.nodes[j].balance
+            param.nodes[i].perceived_balance[j] = param.nodes[j].balance
 
 
 # Simulate till there are no pending tasks left
 def simulate():
+    # Create genesis block
+    param.blocks[0] = genesisBlock()
     # Generate first empty transaction for each node
     # Start mining on all nodes
     for i in range(param.num_nodes):

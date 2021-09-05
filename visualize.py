@@ -1,7 +1,7 @@
 import igraph
 from igraph import *
 
-file = open("eg.txt","r")
+file = open("bin/Data_node_0.txt","r")
 nr_vertices = 1
 v_label = {}
 v_label['0'] = 0

@@ -30,7 +30,7 @@ class node:
         # Second is the pointer to the block object for the block
         # As the block has the ID of the previous block, we can create a chain from the block
         self.blockchain = {}
-        self.blockchain[0] = [0, genesisBlock()]
+        self.blockchain[0] = [0, 0]
         self.longest = self.blockchain[0]
         self.timeNextBlock = 0
 
@@ -58,7 +58,7 @@ class node:
 
         # Update global list of transactions
         param.transactions[TXN_ID] = Transaction(TXN_ID,self.uniqueID,payee_ID,amount)
-        print("\t Transaction \t\t",param.transactions[TXN_ID].printTransaction())
+        # print("\t Transaction \t\t",param.transactions[TXN_ID].printTransaction())
 
         # Update current balance
         self.balance -= amount
@@ -103,7 +103,8 @@ class node:
     # Function to generate block
     def generateBlock(self, start_time):
         new_block = block(self.longest[1])
-        self.longest = [self.longest[0]+1,new_block]
+        new_block.creator = self.uniqueID
+        self.longest = [self.longest[0]+1,new_block.uniqueID]
         self.blockchain[new_block.uniqueID] = self.longest
         param.blocks[new_block.uniqueID] = new_block
 
@@ -115,11 +116,13 @@ class node:
         param.next_TXN_ID += 1
         coinbase  = Transaction(TXN_ID,-1,self.uniqueID,param.mining_fee)
         param.transactions[TXN_ID] = coinbase
-        new_block.transactions.append(coinbase)
+        new_block.transactions.append(TXN_ID)
         # Other transactions
-        for TXN in reversed(self.pending_TXN):
+        for TXN in self.pending_TXN:
             if (i < 1023):
                 new_block.transactions.append(TXN)
+        for TXN in new_block.transactions:
+            if (param.transactions[TXN].payer != -1):
                 self.pending_TXN.remove(TXN)
         new_block.size = param.TXN_size * len(new_block.transactions)
 
@@ -127,20 +130,22 @@ class node:
         self.balance += param.mining_fee
 
         # Broadcast to peers (omit no peers)
-        self.broadcastBlock(new_block, start_time, [])
+        self.broadcastBlock(new_block.uniqueID, start_time, [])
 
     # Function to broadcast a block to peers
-    def broadcastBlock(self, block, start_time, peers_to_omit):
+    def broadcastBlock(self, blockID, start_time, peers_to_omit):
         for peer in self.peers:
             if (peer in peers_to_omit):
                 continue
-            param.tasks[self.peers[peer][0] + block.size / self.peers[peer][1] + \
+            param.tasks[self.peers[peer][0] + param.blocks[blockID].size / self.peers[peer][1] + \
                         random.expovariate(self.peers[peer][1] / (96 * 1024)) + start_time] \
-                = "ReceiveBlock: " + str(self.uniqueID) + " " + str(peer) + " " + str(block.uniqueID)
+                = "ReceiveBlock: " + str(self.uniqueID) + " " + str(peer) + " " + str(blockID)
 
     # Function to receive block
     # It will also validate the received block and broadcast further if valid
     def receiveBlock(self,blockID,start_time,sender):
+        if int(blockID) in self.blockchain.keys():
+            return
         block = param.blocks[int(blockID)]
         
         # Code to check whether the block is valid
@@ -162,7 +167,7 @@ class node:
                 if (TXN.payer != -1):
                     self.pending_TXN.remove(TXN_ID)
             # Add mining fee to perceived balance for sender node
-            perceived_balance[sender] += param.mining_fee
+            self.perceived_balance[sender[0]] += param.mining_fee
 
             # Discard generation of current block if the new block is longest
             # and start mining on the new block
@@ -171,35 +176,41 @@ class node:
                 self.generateBlockEvent(start_time)
             
     def addBlockToBlockchain(self,block):
-        prev_block = block.prev_block
-        length = blockchain[prev_block][0]+1
+        prev_blockID = block.prev_blockID
+        length = self.blockchain[prev_blockID][0]+1
+        self.blockchain[block.uniqueID] = [length,block.uniqueID]
         if (length > self.longest[0]):
-            self.longest = [length,block]
+            self.longest = [length,block.uniqueID]
 
     def validateBlock(self,block):
-        if block.prev_block not in self.blockchain.keys():
+        if block.prev_blockID not in self.blockchain.keys():
+            print(block.prev_blockID,"Reject due to parent not found")
             return 0
         temporary_balance = self.perceived_balance
         for TXN_ID in block.transactions:
             TXN = param.transactions[TXN_ID]
             if (TXN.payer != -1):
-                if TXN_ID not in param.transactions.keys():
+                if TXN_ID not in self.pending_TXN:
+                    print("Reject due to illegal TXN")
                     return 0
+                   
                 temporary_balance[TXN.payer] -= TXN.amount
                 temporary_balance[TXN.payee] += TXN.amount
         if (min(temporary_balance.values())<0):
+            print("Reject due to overspending")
             return 0
         self.perceived_balance = temporary_balance
+        print("Accepted")
         return 1
                
 
     def writeDataToFile(self):
         file = open(param.file_prefix + str(self.uniqueID) + param.file_extension, "w")
         for block in self.blockchain.values():
-            if (block[1].uniqueID == 0):
+            if (block[1] == 0):
                 continue
             else:
-                file.write(str(block[1].uniqueID) + " " + str(block[1].prev_block.uniqueID) + "\n")
+                file.write(str(block[1]) + " " + str(param.blocks[block[1]].prev_blockID) + "\n")
         file.close()
 
 
@@ -219,12 +230,13 @@ class Transaction:
 # Add other methods/arguments as required
 class block:
 
-    def __init__(self, prev_block):
-        self.prev_block = prev_block
+    def __init__(self, prev_blockID):
+        self.prev_blockID = prev_blockID
         self.size = 0
         self.uniqueID = param.next_block_ID
         param.next_block_ID += 1
         self.transactions = []
+        self.creator = -1
 
 
 # Genesis block. All nodes start with this (see init function of node).

@@ -1,4 +1,4 @@
-max_sim_time = 100
+max_sim_time = 1000
 
 num_nodes = 10
 num_connections = 12
