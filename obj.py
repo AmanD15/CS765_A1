@@ -5,7 +5,7 @@ import random
 # Transaction: <Payer> pays <Payee> <Amount> coins
 # GenerateTXN: <TXN_generating_node>
 # ReceiveTXN: <sender> <receiver> <TXN_ID>
-# GenerateBlock: <Creator> <Block_ID>
+# GenerateBlock: <Creator>
 # ReceiveBlock: <sender> <receiver> <Block_ID>
 
 
@@ -18,7 +18,7 @@ class node:
         self.fast = (random.random() > param.percent_slow)
         self.t_tx = t_tx
         self.t_k = param.T_k
-        self.pending_TXN = set()
+        self.pending_TXN = []
         self.peers = {}
         self.balance = param.start_coins
         self.perceived_balance = {}
@@ -54,11 +54,11 @@ class node:
         param.next_TXN_ID += 1
 
         # Update own set of pending TXN
-        self.pending_TXN.add(TXN_ID)
+        self.pending_TXN.append(TXN_ID)
 
         # Update global list of transactions
         param.transactions[TXN_ID] = Transaction(TXN_ID,self.uniqueID,payee_ID,amount)
-        print("\t\t\t\t",param.transactions[TXN_ID].printTransaction())
+        print("\t Transaction \t\t",param.transactions[TXN_ID].printTransaction())
 
         # Update current balance
         self.balance -= amount
@@ -83,7 +83,7 @@ class node:
         # Else it would have been broadcasted earlier
         TXN_ID = int(TXN_ID)
         if (TXN_ID not in self.pending_TXN):
-            self.pending_TXN.add(TXN_ID)
+            self.pending_TXN.append(TXN_ID)
             self.broadcastTransaction(TXN_ID, start_time, sender)
 
             # Check whether the money in the TXN is for the receiver
@@ -97,7 +97,7 @@ class node:
         next_event_time = random.expovariate(1 / self.t_k) + start_time
 
         # Add TXN generation to list of tasks
-        param.tasks[next_event_time] = "GenerateBlock: " + str(self.uniqueID) + " " + str(new_block.uniqueID)
+        param.tasks[next_event_time] = "GenerateBlock: " + str(self.uniqueID)
         self.timeNextBlock = next_event_time
     
     # Function to generate block
@@ -113,11 +113,13 @@ class node:
         #  Coinbase TXN
         TXN_ID = param.next_TXN_ID
         param.next_TXN_ID += 1
-        block.append(Transaction(TXN_ID,-1,self.uniqueID,param.mining_fee))
+        coinbase  = Transaction(TXN_ID,-1,self.uniqueID,param.mining_fee)
+        param.transactions[TXN_ID] = coinbase
+        new_block.transactions.append(coinbase)
         # Other transactions
-        for TXN in self.pending_TXN:
+        for TXN in reversed(self.pending_TXN):
             if (i < 1023):
-                new.block.transactions.add(TXN)
+                new_block.transactions.append(TXN)
                 self.pending_TXN.remove(TXN)
         new_block.size = param.TXN_size * len(new_block.transactions)
 
@@ -125,7 +127,7 @@ class node:
         self.balance += param.mining_fee
 
         # Broadcast to peers (omit no peers)
-        self.broadcastBlock(new_block, next_event_time, [])
+        self.broadcastBlock(new_block, start_time, [])
 
     # Function to broadcast a block to peers
     def broadcastBlock(self, block, start_time, peers_to_omit):
@@ -139,27 +141,58 @@ class node:
     # Function to receive block
     # It will also validate the received block and broadcast further if valid
     def receiveBlock(self,blockID,start_time,sender):
-        block = param.blocks[blockID]
-        block_valid = 1
+        block = param.blocks[int(blockID)]
         
         # Code to check whether the block is valid
-        
+        block_valid = self.validateBlock(block)
 
         # Proceed if block is valid
         # Else, do nothing
         if (block_valid):
-            self.addBlockToBlockchain(blockID)
-            self.broadcastBlock(blockID, start_time, sender)
-            param.tasks.pop(self.timeNextBlock)
-            self.generateBlockEvent(start_time)
+
+            # Add block to own blockchain
+            self.addBlockToBlockchain(block)
+
+            # Broadcast to peers
+            self.broadcastBlock(int(blockID), start_time, sender)
             
-    def addBlockToBlockchain(BlockID):
-        block = param.blocks[BlockID]
+            # Update set of pending transactions
+            for TXN_ID in block.transactions:
+                TXN = param.transactions[TXN_ID]
+                if (TXN.payer != -1):
+                    self.pending_TXN.remove(TXN_ID)
+            # Add mining fee to perceived balance for sender node
+            perceived_balance[sender] += param.mining_fee
+
+            # Discard generation of current block if the new block is longest
+            # and start mining on the new block
+            if (self.longest[1] == param.blocks[int(blockID)]):
+                param.tasks.pop(self.timeNextBlock)
+                self.generateBlockEvent(start_time)
+            
+    def addBlockToBlockchain(self,block):
         prev_block = block.prev_block
         length = blockchain[prev_block][0]+1
         if (length > self.longest[0]):
             self.longest = [length,block]
-			
+
+    def validateBlock(self,block):
+        if block.prev_block not in self.blockchain.keys():
+            return 0
+        temporary_balance = self.perceived_balance
+        for TXN_ID in block.transactions:
+            TXN = param.transactions[TXN_ID]
+            if (TXN.payer != -1):
+                if TXN_ID not in param.transactions.keys():
+                    return 0
+                temporary_balance[TXN.payer] -= TXN.amount
+                temporary_balance[TXN.payee] += TXN.amount
+        if (min(temporary_balance.values())<0):
+            return 0
+        self.perceived_balance = temporary_balance
+        return 1
+               
+
     def writeDataToFile(self):
         file = open(param.file_prefix + str(self.uniqueID) + param.file_extension, "w")
         for block in self.blockchain.values():
