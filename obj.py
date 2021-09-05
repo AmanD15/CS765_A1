@@ -119,7 +119,7 @@ class node:
         new_block.transactions.append(TXN_ID)
         # Other transactions
         for TXN in self.pending_TXN:
-            if (i < 1023):
+            if (i < 1023)and (len(self.pending_TXN)-len(new_block.transactions)>param.not_included_TXN):
                 new_block.transactions.append(TXN)
         for TXN in new_block.transactions:
             if (param.transactions[TXN].payer != -1):

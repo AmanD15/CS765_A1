@@ -1,4 +1,6 @@
-max_sim_time = 1000
+max_sim_time = 100
+
+not_included_TXN = 5
 
 num_nodes = 10
 num_connections = 12
