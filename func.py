@@ -62,12 +62,17 @@ def createNetwork():
 
         num_connections_left = num_connections_left - 1
 
+    # Everyone knows each other's initial balance
+    for i in range(num_nodes):
+        for j in range(num_nodes):
+            param.nodes[i].perceived_balance[param.nodes[j]] = param.nodes[j].balance
+
 
 # Simulate till there are no pending tasks left
 def simulate():
     # Generate first empty transaction for each node
     for i in range(param.num_nodes):
-        param.nodes[i].generateTransaction(i,0,0)
+        param.nodes[i].generateTransactionEvent(0)
 
     while len(param.tasks.keys()):
 
@@ -81,22 +86,23 @@ def simulate():
 
         # Generate new transaction after the current one is broadcasted
         if param.tasks[next_event_time].split(":")[0] == "GenerateTXN":
-            nodeID = int(param.tasks[next_event_time].split(" ")[2])
-            node = param.nodes[nodeID]
-            node.balance -= int(param.tasks[next_event_time].split(" ")[5])
+            node = param.nodes[int(param.tasks[next_event_time].split(" ")[1])]
 
-            # Dummy transaction to maintain interarrival times if balance is zero
+            # Dummy transaction to self to maintain interarrival times if balance is zero
             if node.balance < 1:
-                node.generateTransaction(nodeID,0,next_event_time)
+                node.generateTransaction(node.uniqueID,0,next_event_time)
             
             # Next transaction
             else:
                 node_to_pay = random.randint(0, param.num_nodes-1)
-                if node_to_pay == nodeID:
+                if node_to_pay == node.uniqueID:
                     node.generateTransaction(node_to_pay,0,next_event_time)
                 else:
                     amount_to_pay = random.randint(1,node.balance)
                     node.generateTransaction(node_to_pay,amount_to_pay,next_event_time)
+
+            # Generate next transaction event
+            node.generateTransactionEvent(next_event_time)
 
         # Handle reception of transactions
         if param.tasks[next_event_time].split(":")[0] == "ReceiveTXN":

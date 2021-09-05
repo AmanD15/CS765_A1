@@ -4,7 +4,7 @@ import random
 
 
 args = func.parseInputs()
-nodes = func.createNetwork()
+func.createNetwork()
 
 # Simulator
 func.simulate()
