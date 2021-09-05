@@ -21,7 +21,7 @@ class node:
         self.pending_TXN = []
         self.peers = {}
         self.balance = param.start_coins
-        self.perceived_balance = {}
+        # self.perceived_balance = {}
 
         # Blockchain stores a list of blocks validated by the node
         # Key is the uniqueID of the block
@@ -119,12 +119,17 @@ class node:
         new_block.transactions.append(TXN_ID)
         # Other transactions
         for TXN in self.pending_TXN:
-            if (i < 1023)and (len(self.pending_TXN)-len(new_block.transactions)>param.not_included_TXN):
+            if (i >= 1023):
+                break
+            if (new_block.balances_at_end[param.transactions[TXN].payer] - param.transactions[TXN].amount >= 0) \
+            and (TXN not in new_block.TXN_at_end):
                 new_block.transactions.append(TXN)
-        for TXN in new_block.transactions:
-            if (param.transactions[TXN].payer != -1):
-                self.pending_TXN.remove(TXN)
+                new_block.TXN_at_end.add(TXN)
+                new_block.balances_at_end[param.transactions[TXN].payer] -= param.transactions[TXN].amount
+                new_block.balances_at_end[param.transactions[TXN].payee] += param.transactions[TXN].amount
+            i+=1
         new_block.size = param.TXN_size * len(new_block.transactions)
+        new_block.balances_at_end[self.uniqueID] += 50
 
         # Add mining fee to balance
         self.balance += param.mining_fee
@@ -161,14 +166,6 @@ class node:
             # Broadcast to peers
             self.broadcastBlock(int(blockID), start_time, sender)
             
-            # Update set of pending transactions
-            for TXN_ID in block.transactions:
-                TXN = param.transactions[TXN_ID]
-                if (TXN.payer != -1):
-                    self.pending_TXN.remove(TXN_ID)
-            # Add mining fee to perceived balance for sender node
-            self.perceived_balance[sender[0]] += param.mining_fee
-
             # Discard generation of current block if the new block is longest
             # and start mining on the new block
             if (self.longest[1] == param.blocks[int(blockID)]):
@@ -184,22 +181,14 @@ class node:
 
     def validateBlock(self,block):
         if block.prev_blockID not in self.blockchain.keys():
-            print(block.prev_blockID,"Reject due to parent not found")
+            print(block.prev_blockID,"Rejected due to parent not found")
             return 0
-        temporary_balance = self.perceived_balance
         for TXN_ID in block.transactions:
             TXN = param.transactions[TXN_ID]
             if (TXN.payer != -1):
                 if TXN_ID not in self.pending_TXN:
                     print("Reject due to illegal TXN")
                     return 0
-                   
-                temporary_balance[TXN.payer] -= TXN.amount
-                temporary_balance[TXN.payee] += TXN.amount
-        if (min(temporary_balance.values())<0):
-            print("Reject due to overspending")
-            return 0
-        self.perceived_balance = temporary_balance
         print("Accepted")
         return 1
                
@@ -237,6 +226,8 @@ class block:
         param.next_block_ID += 1
         self.transactions = []
         self.creator = -1
+        self.balances_at_end = param.blocks[prev_blockID].balances_at_end
+        self.TXN_at_end = param.blocks[prev_blockID].TXN_at_end
 
 
 # Genesis block. All nodes start with this (see init function of node).
@@ -245,3 +236,7 @@ class genesisBlock:
     def __init__(self):
         self.uniqueID = 0
         self.size = param.TXN_size
+        self.balances_at_end = {}
+        self.TXN_at_end = set()
+        for node in param.nodes.keys():
+            self.balances_at_end[node] = 0

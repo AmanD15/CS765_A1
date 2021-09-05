@@ -62,10 +62,10 @@ def createNetwork():
 
         num_connections_left = num_connections_left - 1
 
-    # Everyone knows each other's initial balance
-    for i in range(num_nodes):
-        for j in range(num_nodes):
-            param.nodes[i].perceived_balance[j] = param.nodes[j].balance
+    # # Everyone knows each other's initial balance
+    # for i in range(num_nodes):
+    #     for j in range(num_nodes):
+    #         param.nodes[i].perceived_balance[j] = param.nodes[j].balance
 
 
 # Simulate till there are no pending tasks left
