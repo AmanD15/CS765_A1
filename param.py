@@ -1,4 +1,4 @@
-max_sim_time = 100
+max_sim_time = 10
 
 not_included_TXN = 5
 

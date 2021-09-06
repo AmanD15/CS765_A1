@@ -180,15 +180,34 @@ class node:
             self.longest = [length,block.uniqueID]
 
     def validateBlock(self,block):
+        # Illegal block - parent was illegal
         if block.prev_blockID not in self.blockchain.keys():
-            print(block.prev_blockID,"Rejected due to parent not found")
+            print("Rejected due to parent not found")
             return 0
+        balance = param.blocks[block.prev_blockID].balances_at_end
         for TXN_ID in block.transactions:
+            # Double spend attempt - as TXN already in blockchain
+            if (TXN_ID in param.blocks[block.prev_blockID].TXN_at_end):
+                print(TXN_ID)
+                print("Rejected due to an attempted double spend")
+                return 0
+            # TXN not in simulator 
+            # (this implies TXN is not received by receiver)
+            # will consider it illegal
+            if (TXN_ID not in param.transactions.keys()):
+                print("Rejected due to illegal TXN")
+                return 0
             TXN = param.transactions[TXN_ID]
             if (TXN.payer != -1):
+                balance[TXN.payer] -= TXN.amount
+                balance[TXN.payee] += TXN.amount
+                # TXN not received by receiver - will consider it illegal
                 if TXN_ID not in self.pending_TXN:
-                    print("Reject due to illegal TXN")
+                    print("Rejected due to illegal TXN")
                     return 0
+        if min(balance.values())<0:
+            print("Rejected due to illegal TXN - insufficient balance due to TXN")
+            return 0
         print("Accepted")
         return 1
                

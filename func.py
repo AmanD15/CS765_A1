@@ -86,7 +86,7 @@ def simulate():
             break
 
         # Print the next task (Debugging)
-        print("Time  ",next_event_time,"\t",param.tasks[next_event_time])
+        # print("Time  ",next_event_time,"\t",param.tasks[next_event_time])
 
 
 
@@ -138,7 +138,7 @@ def simulate():
         money_in_circulation = 0
         for node in param.nodes.values():
             money_in_circulation += node.balance
-        print(money_in_circulation)
+        # print(money_in_circulation)
 
         # Delete the task after it is processed appropriately
         del param.tasks[next_event_time]
