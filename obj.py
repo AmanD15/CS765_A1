@@ -182,13 +182,12 @@ class node:
     def validateBlock(self,block):
         # Illegal block - parent was illegal
         if block.prev_blockID not in self.blockchain.keys():
-            print("Rejected due to parent not found")
+            print("Rejected due to parent not found",block.prev_blockID)
             return 0
-        balance = param.blocks[block.prev_blockID].balances_at_end
+        balance = param.blocks[block.prev_blockID].balances_at_end.copy()
         for TXN_ID in block.transactions:
             # Double spend attempt - as TXN already in blockchain
             if (TXN_ID in param.blocks[block.prev_blockID].TXN_at_end):
-                print(TXN_ID)
                 print("Rejected due to an attempted double spend")
                 return 0
             # TXN not in simulator 
@@ -206,9 +205,11 @@ class node:
                     print("Rejected due to illegal TXN")
                     return 0
         if min(balance.values())<0:
+            print(balance)
+            print(param.blocks[block.prev_blockID].balances_at_end,"\n")
             print("Rejected due to illegal TXN - insufficient balance due to TXN")
             return 0
-        print("Accepted")
+        # print("Accepted")
         return 1
                
 
@@ -245,8 +246,8 @@ class block:
         param.next_block_ID += 1
         self.transactions = []
         self.creator = -1
-        self.balances_at_end = param.blocks[prev_blockID].balances_at_end
-        self.TXN_at_end = param.blocks[prev_blockID].TXN_at_end
+        self.balances_at_end = param.blocks[prev_blockID].balances_at_end.copy()
+        self.TXN_at_end = param.blocks[prev_blockID].TXN_at_end.copy()
 
 
 # Genesis block. All nodes start with this (see init function of node).
