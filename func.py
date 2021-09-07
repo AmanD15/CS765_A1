@@ -4,7 +4,7 @@ import random
 import numpy as np
 import argparse
 
-
+# Parse the input arguments using argparse
 def parseInputs():
     parser = argparse.ArgumentParser(description="Simulate a P2P network")
     parser.add_argument('--num_nodes', type=int, default = 10, help = "Number of nodes in the P2P network")
@@ -14,7 +14,6 @@ def parseInputs():
     parser.add_argument('--start_coins', type=float, default=00.0, help="Number of coins each peer has at"
                                                                          " the beginning")
 
-    # Creates network of peers
     args = parser.parse_args()
     param.num_nodes = args.num_nodes
     param.percent_slow = args.percent_slow
