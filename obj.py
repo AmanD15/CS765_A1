@@ -17,7 +17,7 @@ class node:
         self.uniqueID = uniqueID
         self.fast = (random.random() > param.percent_slow)
         self.t_tx = t_tx
-        self.t_k = random.expovariate(param.T_k)
+        self.t_k = random.expovariate(1/param.T_k)
         self.pending_TXN = []
         self.peers = {}
         self.balance = param.start_coins
