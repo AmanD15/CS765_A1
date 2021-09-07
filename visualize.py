@@ -2,7 +2,7 @@ import igraph
 from igraph import *
 
 for file_num in range(10):
-    file = open("bin/Data_node_"+str(file_num)+".txt","r")
+    file = open("bin/Blockdata_node_"+str(file_num)+".txt","r")
     nr_vertices = 1
     v_label = {}
     v_label['0'] = 0

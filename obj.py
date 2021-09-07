@@ -1,13 +1,14 @@
 import param
 import random
 
-# Formats used for storing different tasks
+# Transaction format
 # Transaction: <Payer> pays <Payee> <Amount> coins
+
+# Formats used for storing different tasks
 # GenerateTXN: <TXN_generating_node>
 # ReceiveTXN: <sender> <receiver> <TXN_ID>
 # GenerateBlock: <Creator>
 # ReceiveBlock: <sender> <receiver> <Block_ID>
-
 
 # Node class to store each peer
 class node:
@@ -21,7 +22,6 @@ class node:
         self.pending_TXN = []
         self.peers = {}
         self.balance = param.start_coins
-        # self.perceived_balance = {}
 
         # Blockchain stores a list of blocks validated by the node
         # Key is the uniqueID of the block
@@ -32,9 +32,15 @@ class node:
         self.blockchain = {}
         self.blockchain[0] = [0, 0]
         self.longest = self.blockchain[0]
+        self.num_blocks_created = 0
+
+        # Time at which next block generation event is scheduled
         self.timeNextBlock = 0
 
     # Handle to add new peer
+    # Each peer data is a list of two elements:
+    # The first correspond to \rho_i_j, speed of light propagation delay (asymmetric)
+    # The second corresponds to c_i_j, Link speed
     def add_peer(self, peer):
         self.peers[peer.uniqueID] = [random.uniform(0.001, 0.5), param.MB2b * (5 + 95 * (self.fast and peer.fast))]
 
@@ -107,6 +113,7 @@ class node:
         self.longest = [self.longest[0]+1,new_block.uniqueID]
         self.blockchain[new_block.uniqueID] = self.longest
         param.blocks[new_block.uniqueID] = new_block
+        self.num_blocks_created += 1
 
         # Add transactions to block
         i = 0
@@ -212,6 +219,25 @@ class node:
                
 
     def writeDataToFile(self):
+        file = open(param.file_prefix2 + param.file_extension, "a")
+        file.write("ID: "+str(self.uniqueID)+"\n")
+        fast = "Slow"
+        if (self.fast):
+            fast = "Fast"
+        file.write("Type: "+fast+"\n")
+        file.write("Block generation time: "+str(self.t_k)+"\n")
+        file.write("Number of blocks created: "+str(self.num_blocks_created)+"\n")
+        num_blocks_in_chain = 0
+        blockID = self.longest[1]
+        while (blockID != 0):
+            if (param.blocks[blockID].creator == self.uniqueID):
+                num_blocks_in_chain += 1
+            blockID = param.blocks[blockID].prev_blockID
+        file.write("Number of blocks in longest chain: "+str(num_blocks_in_chain)+"\n")
+        file.write("Length of longest chain: "+str(self.longest[0])+"\n")
+        file.write("Balance at end: "+str(param.blocks[self.longest[1]].balances_at_end[self.uniqueID])+"\n\n")
+        file.close()
+
         file = open(param.file_prefix + str(self.uniqueID) + param.file_extension, "w")
         for block in self.blockchain.values():
             if (block[1] == 0):
