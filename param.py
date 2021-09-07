@@ -3,7 +3,7 @@
 # Maximum time for whic hsimulation should be performed
 max_sim_time = 100
 # Number of nodes (can be modified using command line input)
-num_nodes = 50
+num_nodes = 10
 # Inter-arrival time between TXN of each node
 T_tx = 10
 # Mean inter-arrival time between blocks of each node
