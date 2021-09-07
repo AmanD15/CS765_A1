@@ -2,8 +2,10 @@ import func
 import param
 import random
 
+# Parse command line inputs
+func.parseInputs()
 
-args = func.parseInputs()
+# Generate the nodes and create a P2P network
 func.createNetwork()
 
 # Simulator

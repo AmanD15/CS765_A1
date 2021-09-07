@@ -205,8 +205,6 @@ class node:
                     print("Rejected due to illegal TXN")
                     return 0
         if min(balance.values())<0:
-            print(balance)
-            print(param.blocks[block.prev_blockID].balances_at_end,"\n")
             print("Rejected due to illegal TXN - insufficient balance due to TXN")
             return 0
         # print("Accepted")
