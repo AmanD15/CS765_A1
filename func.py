@@ -39,7 +39,7 @@ def parseInputs():
 def createNetwork():
 
     num_nodes = param.num_nodes
-    num_connections = param.num_connections
+    num_connections = 2*param.num_nodes
 
     # Create new nodes and add to global list of nodes
     for i in range(num_nodes):
@@ -98,7 +98,7 @@ def simulate():
             break
 
         # Print the task
-        # print("Time  ",next_event_time,"\t",param.tasks[next_event_time])
+        print("Time  ",next_event_time,"\t",param.tasks[next_event_time])
 
 
         # Handle generation of TXN by a node
@@ -155,7 +155,7 @@ def simulate():
         money_in_circulation = 0
         for node in param.nodes.values():
             money_in_circulation += node.balance
-        # print("Time  ",next_event_time,"\t Money in circulation =",money_in_circulation,"coins")
+        print("Time  ",next_event_time,"\t Money in circulation =",money_in_circulation,"coins")
 
         # Remove the task from the simulator queue it is processed appropriately
         del param.tasks[next_event_time]

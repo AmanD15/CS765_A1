@@ -53,7 +53,7 @@ class node:
     # The first correspond to \rho_i_j, speed of light propagation delay (asymmetric)
     # The second corresponds to c_i_j, Link speed
     def add_peer(self, peer):
-        self.peers[peer.uniqueID] = [random.uniform(0.001, 0.5), param.MB2b * (5 + 95 * (self.fast and peer.fast))]
+        self.peers[peer.uniqueID] = [random.uniform(0.01, 0.5), param.MB2b * (5 + 95 * (self.fast and peer.fast))]
 
     # Generate transaction event
     def generateTransactionEvent(self,start_time):

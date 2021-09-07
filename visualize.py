@@ -1,8 +1,10 @@
 import igraph
+import random
 from igraph import *
 
-def main(loc="bin/Blockdata_node_",number_of_files=1):
-    for file_num in range(1):
+def main(loc="bin/Blockdata_node_",number_of_files=5,max_num=20):
+    for file_n in range(number_of_files):
+        file_num = random.randint(0,max_num-1)
         file = open(loc+str(file_num)+".txt","r")
         nr_vertices = 1
         v_label = {}
@@ -45,7 +47,7 @@ def main(loc="bin/Blockdata_node_",number_of_files=1):
         fig.add_trace(go.Scatter(x=Xn,
                         y=Yn,
                         mode='markers',
-                        name='Aman',
+                        name='',
                         marker=dict(symbol='circle-dot',
                                         size=18,
                                         color='#6175c1',    #'#DB4551',
@@ -78,7 +80,7 @@ def main(loc="bin/Blockdata_node_",number_of_files=1):
                     showticklabels=False,
                     )
 
-        fig.update_layout(title= 'Tree with Reingold-Tilford Layout',
+        fig.update_layout(title= '',
                     annotations=make_annotations(position, v_label),
                     font_size=12,
                     showlegend=False,
