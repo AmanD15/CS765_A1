@@ -30,7 +30,6 @@ def parseInputs():
     param.max_sim_time = args.simT
     # Create file for data
     file = open(param.file_prefix2 + param.file_extension, "w")
-    os.system("rm bin/*")
     file.close()
 
     return args
@@ -98,10 +97,12 @@ def simulate():
         if next_event_time > param.max_sim_time:
             break
 
-        # Print the next task (Debugging)
-        print("Time  ",next_event_time,"\t",param.tasks[next_event_time])
+        # Print the task
+        # print("Time  ",next_event_time,"\t",param.tasks[next_event_time])
 
-        #  Handle generation of TXN by a node
+
+        # Handle generation of TXN by a node
+        # Format - GenerateTXN: <TXN_generating_node>
         if param.tasks[next_event_time].split(":")[0] == "GenerateTXN":
             node = param.nodes[int(param.tasks[next_event_time].split(" ")[1])]
 
@@ -109,7 +110,7 @@ def simulate():
             if node.balance < 1:
                 node.generateTransaction(node.uniqueID,0,next_event_time)
             
-            # Next transaction
+            # Execute transaction
             else:
                 node_to_pay = random.randint(0, param.num_nodes-1)
                 if node_to_pay == node.uniqueID:
@@ -124,6 +125,7 @@ def simulate():
 
 
         # Handle reception of transactions
+        # Format - ReceiveTXN: <sender> <receiver> <TXN_ID>
         if param.tasks[next_event_time].split(":")[0] == "ReceiveTXN":
             data = param.tasks[next_event_time].split(" ",3)
             param.nodes[int(data[2])].receiveTransaction(data[3],next_event_time,[int(data[1])])
@@ -131,6 +133,7 @@ def simulate():
 
 
         # Handle generate of new blocks
+        # Format - GenerateBlock: <Creator>
         if param.tasks[next_event_time].split(":")[0] == "GenerateBlock":
             node = param.nodes[int(param.tasks[next_event_time].split(" ")[1])]
 
@@ -142,15 +145,17 @@ def simulate():
 
 
         # Handle reception of blocks from peers
+        # Format - ReceiveBlock: <sender> <receiver> <Block_ID>
         if param.tasks[next_event_time].split(":")[0] == "ReceiveBlock":
             data = param.tasks[next_event_time].split(" ",3)
             param.nodes[int(data[2])].receiveBlock(data[3],next_event_time,[int(data[1])])
+
 
         # Compute total money in circulation
         money_in_circulation = 0
         for node in param.nodes.values():
             money_in_circulation += node.balance
-        print("Time  ",next_event_time,"\t Money in circulation =",money_in_circulation,"coins")
+        # print("Time  ",next_event_time,"\t Money in circulation =",money_in_circulation,"coins")
 
         # Remove the task from the simulator queue it is processed appropriately
         del param.tasks[next_event_time]
