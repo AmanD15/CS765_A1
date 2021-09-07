@@ -8,6 +8,7 @@ start_coins = 0.0
 
 T_tx = 10
 T_k = 50
+total_hash_power = 0
 
 mining_fee = 50
 

@@ -19,6 +19,7 @@ class node:
         self.fast = (random.random() > param.percent_slow)
         self.t_tx = t_tx
         self.t_k = random.expovariate(1/param.T_k)
+        param.total_hash_power += 1/self.t_k
         self.pending_TXN = []
         self.peers = {}
         self.balance = param.start_coins
@@ -226,6 +227,7 @@ class node:
             fast = "Fast"
         file.write("Type: "+fast+"\n")
         file.write("Block generation time: "+str(self.t_k)+"\n")
+        file.write("Percentage hashing power: "+str(100/(param.total_hash_power*self.t_k))+"\n")
         file.write("Number of blocks created: "+str(self.num_blocks_created)+"\n")
         num_blocks_in_chain = 0
         blockID = self.longest[1]
