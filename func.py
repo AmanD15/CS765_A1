@@ -38,8 +38,7 @@ def parseInputs():
 
 
 # Creates nodes in the network
-def createNetwork():
-
+def createNetwork(num_attacker_connections):
     num_nodes = param.num_nodes
     num_connections = 2*param.num_nodes
 
@@ -50,6 +49,7 @@ def createNetwork():
             continue
         # Node ID = i, interarrival time = T_tx
         param.nodes[i] = node(i,param.T_tx)
+        
 
     # We first create a minimum spanning tree by just performing a random walk on the nodes
     shuffled_indices = list(range(num_nodes))
@@ -68,16 +68,28 @@ def createNetwork():
 
     # These many edges are still left to be assigned
     num_connections_left = num_connections - num_nodes + 1
+    num_attacker_connections -= 1
+
+    while num_attacker_connections > 0:  # Till all attacker edges havent been assigned
+        no_connection_cols = np.where(adjacency_matrix[0] == 0)
+        random_edge = random.choice(range(len(no_connection_cols)))
+        param.nodes[no_connection_cols[random_edge]].add_peer(param.nodes[0])
+        param.nodes[0].add_peer(param.nodes[no_connection_cols[random_edge]])
+        adjacency_matrix[0, no_connection_cols[random_edge]] = 1
+        adjacency_matrix[no_connection_cols[random_edge], 0] = 1
+        num_attacker_connections -= 1
+        num_connections_left -= 1
+
+    new_adjacency_matrix = adjacency_matrix[1:, 1:]
 
     while num_connections_left > 0:  # Till all edges havent been assigned
-        no_connection_rows, no_connection_cols = np.where(adjacency_matrix == 0)   # Edges that dont exist in the network
+        no_connection_rows, no_connection_cols = np.where(new_adjacency_matrix == 0)   # Edges that dont exist in the network
         random_edge = random.choice(range(len(no_connection_rows)))
-        param.nodes[no_connection_rows[random_edge]].add_peer(param.nodes[no_connection_cols[random_edge]])
-        param.nodes[no_connection_cols[random_edge]].add_peer(param.nodes[no_connection_rows[random_edge]])
+        param.nodes[no_connection_rows[random_edge] + 1].add_peer(param.nodes[no_connection_cols[random_edge] + 1])
+        param.nodes[no_connection_cols[random_edge] + 1].add_peer(param.nodes[no_connection_rows[random_edge] + 1])
         adjacency_matrix[no_connection_cols[random_edge], no_connection_rows[random_edge]] = 1
         adjacency_matrix[no_connection_rows[random_edge], no_connection_cols[random_edge]] = 1
-
-        num_connections_left = num_connections_left - 1
+        num_connections_left -= 1
 
 
 # Simulate till there are no pending tasks left
