@@ -67,6 +67,9 @@ transactions = {}
 next_TXN_ID = 0
 next_block_ID = 1
 
+# The type of adversary
+adversary = "selfish"
+
 # File name for storing outputs
 file_prefix = "bin/Blockdata_node_"
 file_prefix2 = "bin/Data"
