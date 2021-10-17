@@ -1,11 +1,11 @@
 # Parameters controlled by command line input
 
-# Maximum time for whic hsimulation should be performed
+# Maximum time for which simulation should be performed
 max_sim_time = 100
 # Number of nodes (can be modified using command line input)
-num_nodes = 10
+num_nodes = 50
 # Inter-arrival time between TXN of each node
-T_tx = 0.010
+T_tx = 0.10
 # Mean inter-arrival time between blocks of each node
 T_k = 50
 # Start coins (default 0), but can be modified as needed
@@ -26,6 +26,7 @@ total_hash_power = 0
 # Mining fee per block
 mining_fee = 50
 
+attack = "none"
 attacker_hash_fraction = 0.1
 attacker_connected = 0.5
 

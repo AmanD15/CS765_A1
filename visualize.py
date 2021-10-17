@@ -5,7 +5,7 @@ from igraph import *
 
 def main(loc="bin/Blockdata_node_",number_of_files=5,max_num=20):
     for file_n in range(number_of_files):
-        file_num = random.randint(0,max_num-1)
+        file_num = random.randint(0,0)
         file = open(loc+str(file_num)+".txt","r")
         nr_vertices = 1
         v_label = {'0': 0}

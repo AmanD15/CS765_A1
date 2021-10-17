@@ -92,7 +92,7 @@ class stubborn(node):
                 param.tasks.pop(self.timeNextBlock)
                 self.generateBlockEvent(start_time)                
 
-            # Else the miner releases all the blocks
+            # Else the miner releases one block
             else:
                 self.broadcastBlock(self.private_chain[0][1],start_time,[])
                 self.balance += param.mining_fee

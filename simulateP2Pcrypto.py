@@ -14,5 +14,6 @@ func.simulate()
 for nodes in param.nodes.values():
     nodes.writeDataToFile()
 
-for i in range(param.num_nodes):
-    print(param.nodes[i].computeMDU())
+file = open(param.file_prefix2 + param.file_extension, "a")
+file.write("Total blocks:"+str(len(param.blocks))+str("\n\n"))
+file.close()
