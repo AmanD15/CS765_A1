@@ -2,13 +2,13 @@ import igraph
 import random
 from igraph import *
 
+
 def main(loc="bin/Blockdata_node_",number_of_files=5,max_num=20):
     for file_n in range(number_of_files):
         file_num = random.randint(0,max_num-1)
         file = open(loc+str(file_num)+".txt","r")
         nr_vertices = 1
-        v_label = {}
-        v_label['0'] = 0
+        v_label = {'0': 0}
         G = Graph() # 2 stands for children number)
         G.add_vertices(1)
         for line in file:
@@ -92,5 +92,6 @@ def main(loc="bin/Blockdata_node_",number_of_files=5,max_num=20):
                     )
         fig.show()
 
-if (__name__=="__main__"):
+
+if __name__=="__main__":
     main()

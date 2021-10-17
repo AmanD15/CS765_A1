@@ -1,6 +1,5 @@
 import func
 import param
-import random
 
 # Parse command line inputs
 func.parseInputs()
