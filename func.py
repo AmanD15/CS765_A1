@@ -19,6 +19,8 @@ def parseInputs():
     parser.add_argument('--start_coins', type=float, default=0.0, help="Number of coins each peer has at"
                                                                          " the beginning, default = 0")
     parser.add_argument('--simT', type=float, default = 100, help = "Maximum simulation time for which the simulator should be run, default 100")
+    parser.add_argument('--attacker_fraction', type=float, default = 0.1, help = "Fraction hashing power owned by attacker, defaut = 0.1")
+    parser.add_argument('--zeta', type=float, default = 0.5, help = "Fraction nodes connected to attacker, default 0.5")
 
 
     args = parser.parse_args()
@@ -30,6 +32,8 @@ def parseInputs():
     param.T_k = args.T_k
     param.start_coins = args.start_coins
     param.max_sim_time = args.simT
+    param.attacker_connected = args.zeta
+    param.attacker_hash_fraction = args.attacker_fraction
     # Create file for data
     file = open(param.file_prefix2 + param.file_extension, "w")
     file.close()
@@ -50,6 +54,10 @@ def createNetwork(num_attacker_connections):
         # Node ID = i, interarrival time = T_tx
         param.nodes[i] = node(i,param.T_tx)
         
+
+    # Set attacker's hashing power to desired fraction
+    param.total_hash_power -= 1/param.nodes[0].t_k
+    param.nodes[0].t_k = (1-param.attacker_hash_fraction)/(param.total_hash_power*param.attacker_hash_fraction)
 
     # We first create a minimum spanning tree by just performing a random walk on the nodes
     shuffled_indices = list(range(num_nodes))

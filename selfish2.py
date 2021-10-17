@@ -67,7 +67,14 @@ class selfish(node):
         block = param.blocks[int(blockID)]
 
         # Code to check whether the block is valid
-        block_valid = self.validateBlock(block)
+        if (int(blockID) in self.wait_for_parent):
+            block_valid = self.validateBlock(block,1)
+        else:
+            block_valid = self.validateBlock(block)
+
+        if (block_valid is None):
+            param.tasks[param.wait_for_parent + start_time] \
+                = "ReceiveBlock: " + str(sender[0]) + " " + str(self.uniqueID) + " " + str(blockID)
 
         # Proceed if block is valid
         # Else, do nothing
@@ -88,7 +95,11 @@ class selfish(node):
             # If previous lead is 1 or 2 and honest mine a block -> attacker releases chain
             elif difference == 1 or difference == 2:
                 for i in range(difference):
-                    self.broadcastBlock(self.private_chain[i][1],start_time,[])
+                    # Adding small delay between two blocks to prevent rejection of second block
+                    # due to parent not senn
+                    # This is due to the fact that d_ij is random and hence the seconde node 
+                    # may reach before first and get rejected
+                    self.broadcastBlock(self.private_chain[i][1],start_time+0.5*i,[])
                     self.balance += param.mining_fee
                     self.blockchain[self.private_chain[i][1]] = self.private_chain[i]
 
@@ -113,3 +124,16 @@ class selfish(node):
         if (length > self.private_longest[0]):
             self.longest = [length,block.uniqueID]
             self.private_longest = [length,block.uniqueID]
+
+    def computeMDU(self):
+        num_blocks_self = 0
+        last_seen = self.longest[1]
+        while (last_seen != 0):
+            last_block = param.blocks[last_seen]
+            if (last_block.creator == self.uniqueID):
+                num_blocks_self += 1
+            last_seen = last_block.prev_blockID
+
+        total_blocks = len(self.blockchain)
+        total_in_chain = self.longest[0]
+        return [num_blocks_self,total_in_chain,total_blocks]

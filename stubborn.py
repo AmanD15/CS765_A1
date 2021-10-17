@@ -67,7 +67,14 @@ class stubborn(node):
         block = param.blocks[int(blockID)]
 
         # Code to check whether the block is valid
-        block_valid = self.validateBlock(block)
+        if (int(blockID) in self.wait_for_parent):
+            block_valid = self.validateBlock(block,1)
+        else:
+            block_valid = self.validateBlock(block)
+
+        if (block_valid is None):
+            param.tasks[param.wait_for_parent + start_time] \
+                = "ReceiveBlock: " + str(sender[0]) + " " + str(self.uniqueID) + " " + str(blockID)
 
         # Proceed if block is valid
         # Else, do nothing
@@ -103,3 +110,15 @@ class stubborn(node):
             self.longest = [length,block.uniqueID]
             self.private_longest = [length,block.uniqueID]
 
+    def computeMDU(self):
+        num_blocks_self = 0
+        last_seen = self.longest[1]
+        while (last_seen != 0):
+            last_block = param.blocks[last_seen]
+            if (last_block.creator == self.uniqueID):
+                num_blocks_self += 1
+            last_seen = last_block.prev_blockID
+
+        total_blocks = len(self.blockchain)
+        total_in_chain = self.longest[0]
+        return [num_blocks_self,total_in_chain,total_blocks]

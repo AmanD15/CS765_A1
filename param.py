@@ -26,6 +26,11 @@ total_hash_power = 0
 # Mining fee per block
 mining_fee = 50
 
+attacker_hash_fraction = 0.1
+attacker_connected = 0.5
+
+wait_for_parent = 10
+
 # TXN_size = 1kB
 TXN_size = 1024 * 8			# 1kB
 MB2b = 1024 * 1024 * 8		# Convert MB to bits

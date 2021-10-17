@@ -48,6 +48,9 @@ class node:
         # Time at which next block generation event is scheduled
         self.timeNextBlock = 0
 
+        # Waiting for parent block
+        self.wait_for_parent = []
+
     # Handle to add new peer
     # Each peer data is a list of two elements:
     # The first correspond to \rho_i_j, speed of light propagation delay (asymmetric)
@@ -194,7 +197,15 @@ class node:
         block = param.blocks[int(blockID)]
         
         # Code to check whether the block is valid
-        block_valid = self.validateBlock(block)
+        if (int(blockID) in self.wait_for_parent):
+            block_valid = self.validateBlock(block,1)
+            self.wait_for_parent.remove(int(blockID))
+        else:
+            block_valid = self.validateBlock(block)
+
+        if (block_valid is None):
+            param.tasks[param.wait_for_parent + start_time] \
+                = "ReceiveBlock: " + str(sender[0]) + " " + str(self.uniqueID) + " " + blockID
 
         # Proceed if block is valid
         # Else, do nothing
@@ -221,11 +232,15 @@ class node:
         if (length > self.longest[0]):
             self.longest = [length,block.uniqueID]
 
-    def validateBlock(self,block):
+    def validateBlock(self,block,retry=0):
         # Illegal block - parent was illegal
         if block.prev_blockID not in self.blockchain.keys():
-            print("Rejected due to parent not found",block.prev_blockID)
-            return 0
+            if (retry):
+                print("Rejected due to parent not found",block.prev_blockID)
+                return 0
+            else:
+                self.wait_for_parent.append(block.uniqueID)
+                return None
         balance = param.blocks[block.prev_blockID].balances_at_end.copy()
         for TXN_ID in block.transactions:
             # Double spend attempt - as TXN already in blockchain
@@ -285,6 +300,19 @@ class node:
             else:
                 file.write(str(block[1]) + " " + str(param.blocks[block[1]].prev_blockID) + "\n")
         file.close()
+
+    def computeMDU(self):
+        num_blocks_adv = 0
+        last_seen = self.longest[1]
+        while (last_seen != 0):
+            last_block = param.blocks[last_seen]
+            if (last_block.creator == 0):
+                num_blocks_adv += 1
+            last_seen = last_block.prev_blockID
+
+        total_blocks = len(self.blockchain)
+        total_in_chain = self.longest[0]
+        return [num_blocks_adv,total_in_chain,total_blocks]
 
 
 class Transaction:
