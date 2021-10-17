@@ -88,12 +88,11 @@ class stubborn(node):
                 param.tasks.pop(self.timeNextBlock)
                 self.generateBlockEvent(start_time)                
 
-            # If previous lead is 1 or 2 and honest mine a block -> attacker releases chain
-            elif difference == 1:
+            # Else the miner releases all the blocks
+            else:
                 self.broadcastBlock(self.private_chain[0][1],start_time,[])
                 self.balance += param.mining_fee
                 self.blockchain[self.private_chain[i][1]] = self.private_chain[i]
-
                 released_blk = self.private_chain.pop(0)
                 self.longest = released_blk
 
