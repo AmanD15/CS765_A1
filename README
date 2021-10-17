@@ -6,8 +6,8 @@ DESCRIPTION:
 
 USAGE:
   python simulateP2Pcrypto.py [-h] [--num_nodes NUM_NODES] [--percent_slow PERCENT_SLOW] [--T_tx T_TX] [--T_k T_K]
-                            [--start_coins START_COINS] [--simT SIMT] [--attacker_fraction ATTACKER_FRACTION]
-                            [--zeta ZETA] [--attack ATTACK]
+                            [--start_coins START_COINS] [--simT SIMT] [--attacker_fraction ATTACKER_FRACTION] [--zeta ZETA]
+                            [--adversary ADVERSARY]
 
 Simulate a P2P network
 
@@ -25,4 +25,5 @@ optional arguments:
   --attacker_fraction ATTACKER_FRACTION
                         Fraction hashing power owned by attacker, defaut = 0.1
   --zeta ZETA           Fraction nodes connected to attacker, default 0.5
-  --attack ATTACK       Type of attack to simulate, values = none, selfish, stubborn
+  --adversary ADVERSARY
+                        Type of adversary, can be none, selfish, stubborn
