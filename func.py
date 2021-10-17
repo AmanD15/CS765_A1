@@ -1,6 +1,8 @@
 # The file contains different global functions needed for the execution of script
 
 from obj import node, genesisBlock
+from selfish2 import selfish
+from stubborn import stubborn
 import param
 import random
 import numpy as np
@@ -43,6 +45,9 @@ def createNetwork():
 
     # Create new nodes and add to global list of nodes
     for i in range(num_nodes):
+        if (i==0):
+            param.nodes[i] = selfish(i,param.T_tx)
+            continue
         # Node ID = i, interarrival time = T_tx
         param.nodes[i] = node(i,param.T_tx)
 
