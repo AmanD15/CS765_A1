@@ -42,9 +42,10 @@ def parseInputs():
 
 
 # Creates nodes in the network
-def createNetwork(num_attacker_connections):
+def createNetwork():
     num_nodes = param.num_nodes
     num_connections = 2*param.num_nodes
+    num_attacker_connections = num_nodes*param.attacker_connected
 
     # Create new nodes and add to global list of nodes
     for i in range(num_nodes):
