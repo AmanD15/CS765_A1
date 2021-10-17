@@ -80,8 +80,9 @@ def createNetwork():
     num_attacker_connections -= 1
 
     while num_attacker_connections > 0:  # Till all attacker edges havent been assigned
-        no_connection_cols = np.where(adjacency_matrix[0] == 0)
+        no_connection_cols, = np.where(adjacency_matrix[0] == 0)
         random_edge = random.choice(range(len(no_connection_cols)))
+        print(no_connection_cols)
         param.nodes[no_connection_cols[random_edge]].add_peer(param.nodes[0])
         param.nodes[0].add_peer(param.nodes[no_connection_cols[random_edge]])
         adjacency_matrix[0, no_connection_cols[random_edge]] = 1
