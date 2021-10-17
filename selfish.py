@@ -11,6 +11,8 @@ func.createNetwork()
 
 class selfish(node):
     def __init__(self):
+        self.private = 0
+        self.private_chain = {}
 
 
     def computeLeadState(self,has_attacker_generated):
