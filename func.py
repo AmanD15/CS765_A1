@@ -21,7 +21,7 @@ def parseInputs():
     parser.add_argument('--simT', type=float, default = 100, help = "Maximum simulation time for which the simulator should be run, default 100")
     parser.add_argument('--attacker_fraction', type=float, default = 0.1, help = "Fraction hashing power owned by attacker, defaut = 0.1")
     parser.add_argument('--zeta', type=float, default = 0.5, help = "Fraction nodes connected to attacker, default 0.5")
-
+    parser.add_argument('--adversary', type=str, default = "selfish", help = "Type of adversary")
 
     args = parser.parse_args()
 
@@ -34,6 +34,7 @@ def parseInputs():
     param.max_sim_time = args.simT
     param.attacker_connected = args.zeta
     param.attacker_hash_fraction = args.attacker_fraction
+    param.adversary = args.adversary
     # Create file for data
     file = open(param.file_prefix2 + param.file_extension, "w")
     file.close()
@@ -49,8 +50,11 @@ def createNetwork():
 
     # Create new nodes and add to global list of nodes
     for i in range(num_nodes):
-        if (i==0):
-            param.nodes[i] = selfish(i,param.T_tx)
+        if i==0:
+            if param.adversary == "selfish":
+                param.nodes[i] = selfish(i,param.T_tx)
+            else:
+                param.nodes[i] = stubborn(i, param.T_tx)
             continue
         # Node ID = i, interarrival time = T_tx
         param.nodes[i] = node(i,param.T_tx)
