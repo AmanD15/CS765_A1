@@ -58,9 +58,6 @@ class selfish(node):
 
         #  Add mining fee to block balances
         new_block.balances_at_end[self.uniqueID] += param.mining_fee
-
-        # Start mining on the private chain
-        self.generateBlockEvent(start_time)
         
     # Function which receives block from honest miners
     def receiveBlock(self,blockID,start_time,sender):
@@ -102,7 +99,7 @@ class selfish(node):
             else:
                 self.broadcastBlock(self.private_chain[0][1],start_time,[])
                 self.balance += param.mining_fee
-                self.blockchain[self.private_chain[i][1]] = self.private_chain[i]
+                self.blockchain[self.private_chain[0][1]] = self.private_chain[0]
                 released_blk = self.private_chain.pop(0)
                 self.longest = released_blk
 
@@ -111,6 +108,7 @@ class selfish(node):
         prev_blockID = block.prev_blockID
         length = self.blockchain[prev_blockID][0]+1
         self.blockchain[block.uniqueID] = [length,block.uniqueID]
+        #  State 0
         #  Update longest if the added block forms the longest chain
         if (length > self.private_longest[0]):
             self.longest = [length,block.uniqueID]

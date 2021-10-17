@@ -58,9 +58,6 @@ class stubborn(node):
 
         #  Add mining fee to block balances
         new_block.balances_at_end[self.uniqueID] += param.mining_fee
-
-        # Start mining on the private chain
-        self.generateBlockEvent(start_time)
         
     # Function which receives block from honest miners
     def receiveBlock(self,blockID,start_time,sender):
@@ -92,7 +89,7 @@ class stubborn(node):
             else:
                 self.broadcastBlock(self.private_chain[0][1],start_time,[])
                 self.balance += param.mining_fee
-                self.blockchain[self.private_chain[i][1]] = self.private_chain[i]
+                self.blockchain[self.private_chain[0][1]] = self.private_chain[0]
                 released_blk = self.private_chain.pop(0)
                 self.longest = released_blk
 

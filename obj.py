@@ -164,7 +164,7 @@ class node:
         new_block.size = param.TXN_size * len(new_block.transactions)
 
         #  Add mining fee to block balances
-        new_block.balances_at_end[self.uniqueID] += 50
+        new_block.balances_at_end[self.uniqueID] += param.mining_fee
 
         # Add mining fee to balance
         self.balance += param.mining_fee

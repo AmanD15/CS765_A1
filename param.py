@@ -5,20 +5,20 @@ max_sim_time = 100
 # Number of nodes (can be modified using command line input)
 num_nodes = 10
 # Inter-arrival time between TXN of each node
-T_tx = 10
+T_tx = 0.010
 # Mean inter-arrival time between blocks of each node
 T_k = 50
 # Start coins (default 0), but can be modified as needed
 start_coins = 0.0
 # Fraction of nodes that are slow
-percent_slow = 0.2
+percent_slow = 0.5
 
 # Number of transactions received last not to be included in the block
 # (as there is a possibility of rejection of block 
 # due to non-arrival of the TXN due to network delay)
 not_included_TXN = 5
 # Number of connections
-num_connections = 12
+num_connections = num_nodes*num_nodes/4
 
 # Will store total hashing power 
 # (= sum of inverse of mean mining time of nodes)
