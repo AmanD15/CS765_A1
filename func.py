@@ -54,9 +54,10 @@ def createNetwork():
         if i==0:
             if param.adversary == "selfish":
                 param.nodes[i] = selfish(i,param.T_tx)
-            elif param.adversary == "stubborn":
+                continue
+            if param.adversary == "stubborn":
                 param.nodes[i] = stubborn(i, param.T_tx)
-            continue
+                continue
 
         # Node ID = i, interarrival time = T_tx
         param.nodes[i] = node(i,param.T_tx)
